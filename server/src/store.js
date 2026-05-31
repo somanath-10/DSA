@@ -1,19 +1,15 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getDb } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const dataDir = path.resolve(__dirname, '../data');
 const questionsPath = path.join(dataDir, 'questions.json');
 const metadataPath = path.join(dataDir, 'metadata.json');
-const progressPath = path.join(dataDir, 'progress.json');
 
-const defaultProgress = () => ({
-  version: 1,
-  updatedAt: new Date().toISOString(),
-  items: {}
-});
+// ─── Static data (files, read-only) ─────────────────────────────────────────
 
 export async function loadQuestions() {
   const raw = await fs.readFile(questionsPath, 'utf8');
@@ -25,39 +21,19 @@ export async function loadMetadata() {
   return JSON.parse(raw);
 }
 
-export async function ensureProgressFile() {
-  await fs.mkdir(dataDir, { recursive: true });
-  try {
-    await fs.access(progressPath);
-  } catch {
-    await saveProgress(defaultProgress());
-  }
-}
+// ─── Progress helpers ────────────────────────────────────────────────────────
 
-export async function loadProgress() {
-  await ensureProgressFile();
-  const raw = await fs.readFile(progressPath, 'utf8');
-  try {
-    const parsed = JSON.parse(raw);
-    if (!parsed.items || typeof parsed.items !== 'object') return defaultProgress();
-    return parsed;
-  } catch {
-    return defaultProgress();
-  }
-}
-
-export async function saveProgress(progress) {
-  progress.updatedAt = new Date().toISOString();
-  const tempPath = `${progressPath}.tmp`;
-  await fs.writeFile(tempPath, JSON.stringify(progress, null, 2), 'utf8');
-  await fs.rename(tempPath, progressPath);
-  return progress;
-}
-
-export async function resetProgress() {
-  const progress = defaultProgress();
-  await saveProgress(progress);
-  return progress;
+export function emptyProgressItem() {
+  return {
+    status: 'not_started',
+    favorite: false,
+    priority: 'medium',
+    notes: '',
+    tags: [],
+    lastReviewedAt: '',
+    nextReviewAt: '',
+    updatedAt: ''
+  };
 }
 
 export function normalizeProgressPatch(body = {}) {
@@ -80,20 +56,67 @@ export function normalizeProgressPatch(body = {}) {
   return patch;
 }
 
-export function emptyProgressItem() {
-  return {
-    status: 'not_started',
-    favorite: false,
-    priority: 'medium',
-    notes: '',
-    tags: [],
-    lastReviewedAt: '',
-    nextReviewAt: '',
-    updatedAt: ''
-  };
-}
-
 export function mergeQuestionProgress(question, progressItems) {
   const item = progressItems[String(question.id)] || emptyProgressItem();
   return { ...question, progress: { ...emptyProgressItem(), ...item } };
+}
+
+// ─── MongoDB progress CRUD ───────────────────────────────────────────────────
+
+function collection() {
+  return getDb().collection('progress');
+}
+
+/**
+ * Load all progress documents from MongoDB.
+ * Returns the same shape the app expects: { version, updatedAt, items: { "id": {...} } }
+ */
+export async function loadProgress() {
+  const docs = await collection().find({}).toArray();
+  const items = {};
+  for (const doc of docs) {
+    const { _id, ...fields } = doc;
+    items[String(_id)] = fields;
+  }
+  return { version: 1, updatedAt: new Date().toISOString(), items };
+}
+
+/**
+ * Save a single question's progress item to MongoDB (upsert by questionId).
+ */
+export async function saveProgressItem(questionId, item) {
+  const { _id, ...fields } = item;
+  await collection().updateOne(
+    { _id: String(questionId) },
+    { $set: fields },
+    { upsert: true }
+  );
+}
+
+/**
+ * Save an entire progress object { items: { id: {...} } } by upserting all items.
+ * Used by import and reset flows.
+ */
+export async function saveProgress(progress) {
+  const col = collection();
+  const entries = Object.entries(progress.items || {});
+  if (entries.length > 0) {
+    const ops = entries.map(([id, item]) => ({
+      updateOne: {
+        filter: { _id: String(id) },
+        update: { $set: { ...item } },
+        upsert: true
+      }
+    }));
+    await col.bulkWrite(ops, { ordered: false });
+  }
+  return progress;
+}
+
+/**
+ * Delete all progress documents — full reset.
+ */
+export async function resetProgress() {
+  await collection().deleteMany({});
+  return { version: 1, updatedAt: new Date().toISOString(), items: {} };
 }

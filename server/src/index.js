@@ -1,12 +1,15 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import { connectDb } from './db.js';
 import {
   loadQuestions,
   loadMetadata,
   loadProgress,
   saveProgress,
+  saveProgressItem,
   resetProgress,
   normalizeProgressPatch,
   emptyProgressItem,
@@ -151,8 +154,7 @@ app.put('/api/progress/:id', async (req, res) => {
   const existing = progress.items[String(id)] || emptyProgressItem();
   const patch = normalizeProgressPatch(req.body);
   const next = { ...existing, ...patch, updatedAt: new Date().toISOString() };
-  progress.items[String(id)] = next;
-  await saveProgress(progress);
+  await saveProgressItem(id, next);
   res.json({ id, progress: next });
 });
 
@@ -161,15 +163,14 @@ app.post('/api/progress/bulk', async (req, res) => {
   const patch = normalizeProgressPatch(req.body.patch || {});
   const validIds = new Set(questions.map((q) => q.id));
   const progress = await loadProgress();
-  let updated = 0;
+  const batchItems = {};
   for (const id of ids) {
     if (!validIds.has(id)) continue;
     const existing = progress.items[String(id)] || emptyProgressItem();
-    progress.items[String(id)] = { ...existing, ...patch, updatedAt: new Date().toISOString() };
-    updated += 1;
+    batchItems[String(id)] = { ...existing, ...patch, updatedAt: new Date().toISOString() };
   }
-  await saveProgress(progress);
-  res.json({ updated });
+  await saveProgress({ items: batchItems });
+  res.json({ updated: Object.keys(batchItems).length });
 });
 
 app.post('/api/progress/reset', async (_req, res) => {
@@ -216,6 +217,18 @@ app.use((error, _req, res, _next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(port, () => {
-  console.log(`DSA tracker backend running on http://localhost:${port}`);
-});
+async function startServer() {
+  try {
+    await connectDb();
+    app.listen(port, () => {
+      console.log(`DSA tracker backend running on http://localhost:${port}`);
+    });
+  } catch (err) {
+    console.error('Failed to connect to MongoDB', err);
+    process.exit(1);
+  }
+}
+
+
+startServer();
+
