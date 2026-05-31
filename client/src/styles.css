@@ -522,6 +522,12 @@ select {
   padding-right: 40px;
 }
 
+select option {
+  background-color: #0b0f19;
+  color: #f3f4f6;
+}
+
+
 .clear-button {
   display: inline-flex;
   align-items: center;
