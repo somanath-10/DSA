@@ -1,0 +1,188 @@
+{
+  "generatedAt": "2026-05-31T12:53:03.931504+00:00",
+  "sourceZip": "Leetcode Company Wise Problems - Updated as of March 2025 - Krishan Kumar.zip",
+  "rootFolder": "Leetcode Company Wise Problems - Updated as of March 2025 - Krishan Kumar",
+  "csvSheetsScanned": 1225,
+  "companyFoldersChecked": 245,
+  "sourceRowsScanned": 16543,
+  "uniqueQuestions": 1755,
+  "duplicateSourceRowsRemoved": 14788,
+  "rowsMissingLinks": 0,
+  "rowsMissingTitles": 0,
+  "rowsMissingTopics": 47,
+  "emptyRowsSkipped": 0,
+  "txtFilesIgnored": 21,
+  "parserErrors": 0,
+  "emptyCsvHeaderWarnings": 373,
+  "dedupeRule": "Normalized platform/problem link; title fallback only when link is blank.",
+  "difficulties": {
+    "EASY": 395,
+    "MEDIUM": 966,
+    "HARD": 394
+  },
+  "topCompanies": [
+    [
+      "Google",
+      287
+    ],
+    [
+      "Bloomberg",
+      211
+    ],
+    [
+      "Meta",
+      207
+    ],
+    [
+      "Amazon",
+      204
+    ],
+    [
+      "Microsoft",
+      204
+    ],
+    [
+      "TikTok",
+      199
+    ],
+    [
+      "Uber",
+      179
+    ],
+    [
+      "Oracle",
+      159
+    ],
+    [
+      "Apple",
+      156
+    ],
+    [
+      "Goldman Sachs",
+      149
+    ],
+    [
+      "LinkedIn",
+      136
+    ],
+    [
+      "Salesforce",
+      136
+    ],
+    [
+      "tcs",
+      128
+    ],
+    [
+      "Accenture",
+      124
+    ],
+    [
+      "Walmart Labs",
+      124
+    ],
+    [
+      "Yandex",
+      121
+    ],
+    [
+      "Zoho",
+      121
+    ],
+    [
+      "IBM",
+      119
+    ],
+    [
+      "Nvidia",
+      118
+    ],
+    [
+      "DE Shaw",
+      113
+    ]
+  ],
+  "topTopics": [
+    [
+      "Array",
+      981
+    ],
+    [
+      "String",
+      434
+    ],
+    [
+      "Hash Table",
+      384
+    ],
+    [
+      "Dynamic Programming",
+      301
+    ],
+    [
+      "Math",
+      264
+    ],
+    [
+      "Sorting",
+      244
+    ],
+    [
+      "Greedy",
+      218
+    ],
+    [
+      "Depth-First Search",
+      192
+    ],
+    [
+      "Binary Search",
+      160
+    ],
+    [
+      "Breadth-First Search",
+      157
+    ],
+    [
+      "Tree",
+      140
+    ],
+    [
+      "Two Pointers",
+      136
+    ],
+    [
+      "Matrix",
+      132
+    ],
+    [
+      "Heap (Priority Queue)",
+      115
+    ],
+    [
+      "Bit Manipulation",
+      114
+    ],
+    [
+      "Binary Tree",
+      107
+    ],
+    [
+      "Stack",
+      106
+    ],
+    [
+      "Simulation",
+      92
+    ],
+    [
+      "Prefix Sum",
+      92
+    ],
+    [
+      "Design",
+      91
+    ]
+  ],
+  "parseErrors": []
+}

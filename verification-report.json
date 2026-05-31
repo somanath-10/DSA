@@ -1,0 +1,14 @@
+{
+  "questionCount": 1755,
+  "uniqueLinks": 1755,
+  "missingLinks": 0,
+  "missingTitles": 0,
+  "companies": 244,
+  "topics": 70,
+  "backendFiles": [
+    "server/src/index.js",
+    "server/src/store.js",
+    "server/src/query.js"
+  ],
+  "frontendEntry": "client/src/App.jsx"
+}
