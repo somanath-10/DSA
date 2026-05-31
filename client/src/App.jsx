@@ -68,7 +68,6 @@ export default function App() {
     const ok = window.confirm('Reset all progress, notes, favorites, and review dates?');
     if (!ok) return;
     await api.resetProgress();
-    setSelectedIds([]);
     await refreshQuestions();
     setToast('Progress reset');
   }

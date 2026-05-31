@@ -1,5 +1,4 @@
 import { ExternalLink, Star } from 'lucide-react';
-import { PRIORITY_OPTIONS, STATUS_OPTIONS } from '../utils/constants';
 
 function Tag({ children }) {
   return <span className="tag">{children}</span>;
